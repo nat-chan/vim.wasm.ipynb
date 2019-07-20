@@ -1,0 +1,21 @@
+set expandtab tabstop=4 shiftwidth=4 softtabstop=4
+colorscheme onedark
+syntax enable
+set number
+set clipboard=unnamedplus
+
+function! g:Send() abort range
+	let txt = getline(a:firstline, a:lastline)
+    let templete = [
+    \"var txt = function(){/*",
+    \"*/}.toString().slice(14,-4)",
+    \"var cell = Jupyter.notebook.insert_cell_below()",
+    \"cell.set_text(txt);",
+    \"cell.execute();"]
+	let templete = templete[0:0] + txt +templete[1:]
+	call writefile(templete, "/tmp/out.js")
+	silent !/tmp/out.js
+endfunction
+
+vmap <S-CR> :call Send()<CR>
+nmap <S-CR> :%call Send()<CR>
